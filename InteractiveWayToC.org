@@ -1,4 +1,3 @@
-* Article Setup                                                      :ignore:
 #+TITLE: An Interactive Way To C
 #+DATE: 2019-1-12
 #+AUTHOR: Musa Al-hassy
@@ -13,8 +12,8 @@
 #+IMAGEHEIGHT: 450
 #+IMAGEWIDTH: 450
 
-#+INCLUDE: ~/Dropbox/MyUnicodeSymbols.org
-#+INCLUDE: ~/alhassy.github.io/content/MathJaxPreamble.org
+# +INCLUDE: ~/Dropbox/MyUnicodeSymbols.org
+# +INCLUDE: ~/alhassy.github.io/content/MathJaxPreamble.org
 #
 # Begin server: (shell-command "cd ~/alhassy.github.io/ ; bundle exec jekyll serve &")
 #
@@ -25,7 +24,7 @@
 * COMMENT READ ME
 
 When you first open this file, you will be asked “y or n” to applying the local variables
-in the file. Confirm that my scripts do nothing malicious to your machine, then 
+in the file. Confirm that my scripts do nothing malicious to your machine, then
 (revert-buffer) and enter “y”. My locals will produce ~InteractiveWayToC.el~, which contains
 the utility functions ~f6~-~f9~ for in-Emacs programming and proving.
 
@@ -46,10 +45,6 @@ Have fun!
 
 * Abstract                                                           :ignore:
 
-#+BEGIN_CENTER 
-*Abstract*
-#+END_CENTER
-
 Do you know what the above program accomplishes?
 If you do, did you also spot a special edge case?
 
@@ -57,7 +52,7 @@ We aim to present an approach to program proving in C using a minimal Emacs setu
 so that one may produce literate C programs and be able to prove them correct
 --or execute them-- using a single button press; moreover the output is again in Emacs.
 
-The goal is to learn program proving using the Frama-C tool 
+The goal is to learn program proving using the Frama-C tool
 --without necessarily invoking its gui-- by loading the source of this file into
 Emacs then editing, executing, & proving as you read along.
 One provides for the formal specification of properties of C programs --e.g., using ACSL--
@@ -78,10 +73,10 @@ such as with Isabelle, Coq, or Agda.
 The article /aims/ to be self-contained --not even assuming familiarity with any C!
 
 
-#+BEGIN_QUOTE 
+#+BEGIN_QUOTE
   The presentation and examples are largely inspired by
 
-  + Gilles Dowek's exquisite text [[https://www.springer.com/gp/book/9781848820319][Principles of Programming Languages]]. 
+  + Gilles Dowek's exquisite text [[https://www.springer.com/gp/book/9781848820319][Principles of Programming Languages]].
      - It is tremendously accessible!
 
   + Allan Blanchard's excellent tutorial
@@ -104,13 +99,13 @@ Moreover, many systems rely on code historically written in C that needs to be m
 The traditional way to obtain confidence that a program correctly works is to provide
 inputs we believe to be representative of the actual use of the program and
 verify the results we get are correct. Incidentally, the unexpected cases are often not
-considered whereas they are generally the most dangerous ones. 
+considered whereas they are generally the most dangerous ones.
 Since we cannot test everything, we need to employ great care in selecting good tests.
 
 Since it is hard to answer “Is our software tested enough?”, we consider mathematically
 proving that there cannot be problems at runtime. That is, a specification of the expected
 behaviour is provided, which is satisfied by the /resulting/ program
---note the order: Specify /then obtain/ code! This two-stage process can produce errors 
+--note the order: Specify /then obtain/ code! This two-stage process can produce errors
 in either stage, yet whereas testing ensures “the program avoids the bugs we tested against”
 this approach is a big step ensuring “the program doesn't contain bugs that don't exist in
 the specification.”
@@ -141,10 +136,10 @@ For example, /{5 ≤ x ≤ 10} x ≔ x + 1 { 3 ≤ x ≤ 11}/ is a correct progr
 many more  valid inputs.
 
 In Frama-C, we do not use curly braces like this for such assertions but instead
-express our properties as code annotations using the ANSI C Specification Language 
+express our properties as code annotations using the ANSI C Specification Language
 --ACSL or “axel”. The weakest precondition plugin uses the annotation and the code to
-automatically ensure the program is correct according to the Hoare Logic fashion 
-mentioned earlier. 
+automatically ensure the program is correct according to the Hoare Logic fashion
+mentioned earlier.
 
 ** Getting Started
 
@@ -164,14 +159,14 @@ Which code blocks are currently under focus is controlled by the command
 ~(currently-working-with "nameHere")~, which produces a file ~nameHere.c~ that is used
 for the utility functions. If multiple blocks use the same filename, then the file is
 appended to.
-While reading this tutorial, bring/take code blocks in/out of focus by 
+While reading this tutorial, bring/take code blocks in/out of focus by
 toggling between ~(currently-working-with "nameHere")~ and
-~(not-currently-working-with "nameHere")~ ---that is, simply prepend ~not-~. 
+~(not-currently-working-with "nameHere")~ ---that is, simply prepend ~not-~.
 Remember to undo such a toggle when you're done with a code block.
 
 When no name is provided to ~[not-]currently-working-with~, the name of the buffer is used.
 
-*** Exercise: Hello World 
+*** Exercise: Hello World
 
 0. Insert the text ~<s~ then press the ~TAB~ key.
 1. A new C program template has appeared.
@@ -227,7 +222,7 @@ Or check-boxes beside them if we instead execute
 #+BEGIN_EXAMPLE shell
 frama-c-gui -gui-theme colorblind -wp -rte myfile.c
 #+END_EXAMPLE
-The best way to know which options are available is to use 
+The best way to know which options are available is to use
 #+BEGIN_EXAMPLE shell
 frama-c -wp-help
 #+END_EXAMPLE
@@ -256,7 +251,7 @@ Moreover, another buffer will be open and in red will be highlighted,
 This indicates that, in method ~main~, the named assertion ~Before_Swap~ could not be proven.
 
 # If we “generate” proof matter, then
-# it reports a false assertion at line 24 --look for the phrase ~goal main_assert: false~. 
+# it reports a false assertion at line 24 --look for the phrase ~goal main_assert: false~.
 # Indeed if you invoke ~M-x show-code~ then head to line 24,
 # you will find yourself at the line you altered. Neato!
 
@@ -274,7 +269,7 @@ As such, I suggest the following literate process:
 3. Investigate output, then make changes in source file and re-check.
 
 Observe
-+ Program proof is a way to ensure that our programs only have correct behaviours, 
++ Program proof is a way to ensure that our programs only have correct behaviours,
   described by our specification;
 + It is still our work to ensure that this specification is correct.
 
@@ -290,7 +285,7 @@ from a make-shift ‘Prelude’.
 #+BEGIN_SRC c :tangle (currently-working-with "Prelude")
 
 // Artefacts so that exercises let the system progress as much as possible.
-// 
+//
 //@ predicate Exercise = \false;
 //@ predicate FixMe = \false;
 #define FixMeCode
@@ -321,7 +316,7 @@ in a state satisfying proposition /G/ then it terminates in a state satisfying p
 We usually know /R/ --it is the required behaviour on ~S~ after all-- but otherwise we usually
 only have a vague idea of what /G/ could possible be.
 Dijkstra's /weakest precondition/ operator ‘wp’ tells us how to *compute* /G/ from /R/
---in the process we usually *discover* ~S~. 
+--in the process we usually *discover* ~S~.
 
 Hence, all in all, programming begins with the required goal from which code is then derived.
 
@@ -332,7 +327,7 @@ and it is the callers responsibility to ensure that they are true
 --recall that when a contract is breached, the implementation may behave arbitrarily.
 {{{end-fold}}}
 
-Since ‘wp’ is intended to *compute* the weakest precondition establishing a given 
+Since ‘wp’ is intended to *compute* the weakest precondition establishing a given
 postcondition /R/ for a statement ~S~, it necessarily satisfies
 #+BEGIN_EXAMPLE haskell
     { G } S { R }   ≡   G ⇒ wp S R
@@ -346,7 +341,7 @@ S;
 #+END_EXAMPLE
 
 The WP plugin for Frama-C essentially works by computing ~wp S R~ then attempts to obtain
-a proof for ~G ⇒ wp S R~. 
+a proof for ~G ⇒ wp S R~.
 In particular, by the reflexivity of implication, ‘wp’ guarantees to produce a
 precondition so that the following Hoare triple is valid.
 #+BEGIN_EXAMPLE haskell
@@ -362,15 +357,15 @@ wp “by induction” on the shape of ~S~.
 One reasonable property we impose on wp from the outset is: \\
 If /S/ establishes /R/ which implies /R′/, then /S/ also establishes /R′/.
 #+BEGIN_EXAMPLE
-Monotonicity: R ⇒ R′   implies  wp S R ⇒ wp S R′ 
-                       That is, {wp S R} S {R′} 
+Monotonicity: R ⇒ R′   implies  wp S R ⇒ wp S R′
+                       That is, {wp S R} S {R′}
 #+END_EXAMPLE
 Whence for each definitional clause of wp, we must ensure this desirable property is held.
 
 {{{fold(Relationship To Semantics Brackets)}}}
 
 Imperative programs alter state, as such a statement ~S~ is essentially a function
-that transforms the memory state of the computer. 
+that transforms the memory state of the computer.
 Expressing in English what happens when a statement is executed is possible
 for simple examples, but such explanations quickly become complicated and imprecise.
 Therefore, one introduces a theoretical framework reifying statements as state transformers.
@@ -378,23 +373,23 @@ Therefore, one introduces a theoretical framework reifying statements as state t
 # We shall write ~wp S~ for the function associated with a statement ~S.~
 # This is also a partial function since execution of a statement ~S~ may produce a computational ‘error’.
 
-The two popular notions are the “forwards” ~⟦S⟧~ moves current state to a new state, 
-whereas we are working with “backwards” ~wp S~ which takes a desired state and yields 
+The two popular notions are the “forwards” ~⟦S⟧~ moves current state to a new state,
+whereas we are working with “backwards” ~wp S~ which takes a desired state and yields
 a necessary previous state. The forward notion ‘executes’ a program by starting in
 the empty state and stepping through each command to result in some final state.
 Whereas the backwards notion takes an end goal and suggests which programming constructs
-are needed to obtain it. 
+are needed to obtain it.
 Hence, ‘forwards’ is verification whereas ‘backwards’ is correct-by-construction
 programming.
 
 Suppose there is an infinite set ~Var~ of variables and an infinite set ~Val~ of values,
-which are integers, booleans, etc. In the ‘forwards’ notion, a /state/ is a partial 
-function from variables to values --`partial' since it may be undefined at some 
+which are integers, booleans, etc. In the ‘forwards’ notion, a /state/ is a partial
+function from variables to values --`partial' since it may be undefined at some
 variables, since we usually use only finitely many
 in our programs anyways. E.g., state ~{x ↦ 5, y ↦ 6}~ associates the value 5 to variable ~x~
 but is undefined for variable ~z~. Dually, in the ‘backwards’ notion, a /state/ is a predicate of the
 variables and their values that satisfy the predicate; e.g., the previous example state
-corresponds to the predicate ~x = 5 ∧ y = 6~, where ~z~ can have /any/ value. 
+corresponds to the predicate ~x = 5 ∧ y = 6~, where ~z~ can have /any/ value.
 Hence the predicate formulation is more relaxed and we shall refer to it instead.
 {{{end-fold}}}
 
@@ -413,11 +408,11 @@ with the newly obtained value.
 
 The whole of the contents of the computer's memory is called a /state/.
 We also say “predicate /R/ is the current state” as shorthand for:
-The current state is (non-deterministically) /any/ variable-value assignment 
+The current state is (non-deterministically) /any/ variable-value assignment
 such that predicate /R/ is true.
 
 All in all, executing ~x ≔ E~ loads memory location ~x~ with the value of expression ~E~;
-hence state /R/ is satisfied after an assignment precisely when it is satisfied 
+hence state /R/ is satisfied after an assignment precisely when it is satisfied
 with variable ~x~ replaced by expression ~E~. For example, ~wp (x ≔ x+1) (x = 5)  ≡  (x+1 = 5)~.
 #+BEGIN_EXAMPLE haskell
 wp (x ≔ E) R  ≡  R[x ≔ E]
@@ -428,7 +423,7 @@ which associates the name ~x~ to a location in the computer's memory.
 /Variable declaration/ is a construct that allows the creation of a statement
 composed of a variable, an expression, and a statement. This is written
 ~{T x = e; p}~, then variable ~x~ can be used in statement ~p~, which is called
-the /scope/ of variable ~x~. 
+the /scope/ of variable ~x~.
 ( When ~p~ has no assignments, functional programmers would call this statement
   a /let statement/ since it lets ~x~ take on the value ~e~ in ~p~. )
 
@@ -439,13 +434,13 @@ the /scope/ of variable ~x~.
 
 + Modulo: The number ~a % b~ is ~a - b * (a / b).~
 
-+ Ternary Conditional: For all types, the expression ~(c) ? t : f~ 
++ Ternary Conditional: For all types, the expression ~(c) ? t : f~
    yields ~t~ if boolean ~c~ holds and is ~f~ otherwise.
 
 + A useful inclusion: /2*10^9 <= 2^32 <= 2*10^10/
 
    :Proof:
-Indeed 
+Indeed
 
    2³² ≤ 2*10ᵖ
 ≡  2³¹ ≤ 10ᵖ                 -- Divide by 2
@@ -465,7 +460,7 @@ Indeed
 *** Overshadowing & Explicit Scope Delimitation
 Imperative languages generally do not allow the declaration of the same variable multiple
 times, e.g., the following program crashes with ~error: redefinition of ‘x’~.
-#+BEGIN_SRC c :tangle (not-currently-working-with "overshadowing_error") 
+#+BEGIN_SRC c :tangle (not-currently-working-with "overshadowing_error")
 #include<stdio.h> // for IO
 
 int main()
@@ -501,13 +496,13 @@ that are used. We say that earlier declarations are /hidden/, or /overshadowed/,
 by the later declarations.
 
 {{{fold(Frama-C Rendition)}}}
-#+BEGIN_SRC c :tangle (not-currently-working-with "explicit_scope_framac") 
-int main() 
+#+BEGIN_SRC c :tangle (not-currently-working-with "explicit_scope_framac")
+int main()
 {
   int x = 3;
-  
+
   //@ assert x == 3;
-  
+
   { // Begun new scope
 
     // Old facts are still true.
@@ -524,7 +519,7 @@ int main()
   // In this scope, ‘x’ still has its orignal value.
   //@ assert x == 3;
 
-  return 0; 
+  return 0;
 }
 #+END_SRC
 {{{end-fold}}}
@@ -533,7 +528,7 @@ int main()
 
 /Constant variables/ are variables which may have only one initial value that
 can never be changed. A non-constant variable is called /mutable/, which is
-the default in imperative languages. For example, the following 
+the default in imperative languages. For example, the following
 crashes with ~error: assignment of read-only variable ‘x’~.
 
 #+BEGIN_SRC c
@@ -552,7 +547,7 @@ int main()
 ** Sequence
 
 A /sequence/ is a construct that allows a single statement to be created out of
-two statements ~p~ and ~q~; it is written ~{p q}~. 
+two statements ~p~ and ~q~; it is written ~{p q}~.
 The sequence is executed in state ~s~ by first executing ~p~ in state ~s~ thereby
 producing a new state ~s'~ in which statement ~q~ is then executed.
 - The statement ~{p₁ {p₂ { ... pₙ } ...}}~ can also be written ~{p₁ p₂ ... pₙ}~.
@@ -617,7 +612,7 @@ More concretely,
   @ ensures  -20 <= \result <= 99;
   */
 int using_skip(int a)
-{  
+{
   //@ assert our_strong_pre:         3 < a < 9;
   //@ assert weakened_intermediary: -7 <= a <= 14;
   //@ assert weakening_futher:     -20 <= a <= 99;
@@ -650,7 +645,7 @@ Thus, program ~S~ can also take the type of ~G′~ to ~R′~.
 Writing ~<:~ for ‘sub-type’, or ‘sub-class’, we have argued,
 #+BEGIN_EXAMPLE haskell
 Provided    G′ <: G  and R <: R′
-Then   
+Then
        G → R  <:  G′ → R′
 #+END_EXAMPLE
 It is now easier to see that the second argument of function-type former ‘→’ stays
@@ -678,7 +673,7 @@ The last hint in the above calculation deserves some attention.
 0. Rendered pointfree, i.e., ignoring /R/, the skip rule becomes: /wp skip  = id/.
    - Where /id/ is the identity function: /id(x) = x/.
 1. “Program Equality”: Say ~S ≈ T~ precisely when ~wp S = wp T~.
-   - Two programs are considered equal precisely when they have the same 
+   - Two programs are considered equal precisely when they have the same
      /observational/ behaviour --i.e., can satisfy the same set of post-conditions /R/.
 2. Identity of Sequence Theorem: ~S ; skip  ≈  S  ≈  skip ; S~.
 3. Likewise, define /wp abort R ≡ false/  -- i.e., ~abort~ is a program that crashes on
@@ -696,7 +691,7 @@ to make the assertions provable, and otherwise is not an execution-relevant vari
 
 /*@ requires \valid(x) && \valid(y);
   @ requires INT_MIN < *x + *y < INT_MAX;
-  @ requires \separated(x, y); // Exercise: It's a swap, why is this needed? 
+  @ requires \separated(x, y); // Exercise: It's a swap, why is this needed?
   @ assigns *x, *y;
   */
 void swap(int *x, int *y)
@@ -708,13 +703,13 @@ void swap(int *x, int *y)
   //@ assert  *y == Y  && (*x + *y) - *y == X;
   *x = *x + *y;
   //@ assert  *y == Y  && *x - *y == X;
-  //@ assert  *x - (*x - *y) == Y  && *x - *y == X; 
+  //@ assert  *x - (*x - *y) == Y  && *x - *y == X;
   *y = *x - *y;
-  //@ assert  *x - *y == Y  && *y == X; 
+  //@ assert  *x - *y == Y  && *y == X;
   *x = *x - *y;
-  //@ assert  *x == Y  && *y == X; 
+  //@ assert  *x == Y  && *y == X;
 
-  // 𝓢𝓽𝓪𝓻𝓽 upwards reading from here; 
+  // 𝓢𝓽𝓪𝓻𝓽 upwards reading from here;
   // each assertion is obtained by the assigment, skip, and sequence rules.
 }
 #+END_SRC
@@ -729,7 +724,7 @@ Here is a more complicated exercise that also makes use of external functions...
 
 #define RAND_MAX 32767
 
-/*@ 
+/*@
   @ assigns \nothing;
   @ ensures 0 <= \result <= RAND_MAX;
 */
@@ -744,7 +739,7 @@ int rand();
 int random_between(int min, int max)
 {
   int it = rand();
-  //@ assert weakening: 0 <= it <= RAND_MAX;   
+  //@ assert weakening: 0 <= it <= RAND_MAX;
   //@ assert assignment_rule_again: FixMe;
   it = it % (max - min + 1);
   // @ assert simplify: FixMe;
@@ -769,9 +764,9 @@ int random_between(int min, int max)
 Now press ~F6~ a few times to see some random output.
 
 #+NAME: Trying out our random_between method
-#+BEGIN_SRC c :tangle (not-currently-working-with "randomness_driver") 
+#+BEGIN_SRC c :tangle (not-currently-working-with "randomness_driver")
 #include<stdlib.h> // to use rand
-#include<stdio.h> // for IO 
+#include<stdio.h> // for IO
 #include<time.h>
 
 #undef RAND_MAX   // It's defined as INT_MAX in stdlib.h
@@ -817,7 +812,7 @@ with each branch precondition obtaining the branch guard.
 
 ** Loop
 
-A /loop/ is a construct formed from a Boolean expression and a statement; it is 
+A /loop/ is a construct formed from a Boolean expression and a statement; it is
 written ~while (b) p~.
 A loop is one of the ways in which we can express an infinite object --which may
 fail to terminate-- using a finite expression. Indeed, its executional behaviour
@@ -826,7 +821,7 @@ can be understood by realising it as a shorthand for the expression
 if (b) {p if (b) {p if (b) ...
                     else skip}
           else skip}
-else skip   
+else skip
 #+END_EXAMPLE
 Where ~skip~ is the fictional statement that performs no action when executed.
 
@@ -866,11 +861,11 @@ then the loop will terminate and the property it maintained will be true.
 
 #+BEGIN_EXAMPLE haskell
    {Inv ∧ B ∧ bf = c} S {Inv ∧ bf < c}
-⇒ 
+⇒
    {Inv ∧ bf ≥ 0}  while(B) S  {¬B ∧ Inv}
 #+END_EXAMPLE
 A property that is maintained to be true throughout the loop is referred to as an
-/invariant/. In contrast, a value that changes through every pass 
+/invariant/. In contrast, a value that changes through every pass
 --such as the number of passes remaining, the ~bf~-- is known as a /variant/.
 
 In Frama-C rendition,
@@ -904,11 +899,11 @@ int euclid(int N)
   //@ assert invariant_intially_estabished: 2 * sum == 0 * (0 + 1);
 
   /*@ loop invariant main_item: sum == n * (n + 1) / 2;
-    @ loop invariant always_in_range: 0 <= n <= N; 
+    @ loop invariant always_in_range: 0 <= n <= N;
     @ loop invariant range_for_sum: 0 <= sum;
     // Exercise: Why can we comment out the following two lines?
     @ loop invariant no_overflow1: n < INT_MAX;
-    @ loop invariant no_overflow2: sum <= INT_MAX; 
+    @ loop invariant no_overflow2: sum <= INT_MAX;
     @ loop assigns n, sum;
     @ loop variant N - n;
    */
@@ -955,7 +950,7 @@ int look_ma_no_new_locals(int a)
   int i;                   // So we can refer to this ‘i’ *after* the loop.
   /* // @ loop assigns ???;         // Fix me.
     @ loop invariant a == 666;      // Fix me.
-    @ loop invariant 0 <= i <= 10;    
+    @ loop invariant 0 <= i <= 10;
     @ loop variant   666;           // Fix me.
     @*/
   for(i = 0; i != 10; i++) a++;
@@ -968,7 +963,7 @@ int look_ma_no_new_locals(int a)
 {{{end-fold}}}
 
 *Warning* Without the ~loop assigns~, you are more likely to have trouble proving a loop
-is correct! 
+is correct!
 
 *** Simple Exercise on loops: Randomly increment by /at most/ ~max~ :ignore:
 Now a bit harder...
@@ -1014,7 +1009,7 @@ Our invaraints were getting out of hand, the trouble can be mitigated by definin
 predicates rather than just using the built in ones. However, such definitions must be
 /functional/ in nature: They do not produce side-effects, such as altering state.
 Moreover, they are generally parameterised by a /label/ that refers to the C memory state
-in which they would be invoked --within the definition we cannot however reference the 
+in which they would be invoked --within the definition we cannot however reference the
 special labels ~Here, Pre, Post~. Otherwise parameter passing is by value as in C.
 
 The ~predicate~ keyword declares Boolean values functions:
@@ -1034,8 +1029,8 @@ The ~predicate~ keyword declares Boolean values functions:
 int main()
 {
   int i = 13, j = 12;
-  
-  DoSomeWork: 
+
+  DoSomeWork:
   j = 32;
 
   //@ assert unchanged{DoSomeWork, Here}(&i);
@@ -1073,7 +1068,7 @@ Such logical functions generally need not worry about runtime issues such as ove
 --which however must be handled at the call site, if need be.
 
 #+BEGIN_EXAMPLE c
-/*@ logic return_type function_name {Label₀, …, Labelₖ} (type₀ arg₀, …, typeₘ argₘ) = 
+/*@ logic return_type function_name {Label₀, …, Labelₖ} (type₀ arg₀, …, typeₘ argₘ) =
   @  // A formula using the arguments argᵢ, possibly at labels Labelᵢ
  */
 
@@ -1119,7 +1114,7 @@ For example,
 Sometimes a proof may take too long to be proven, or it cannot be proven with the
 back-end provers, and, moreover, we do not wish to bother with its proof directly.
 In such cases, we may tell Frama-C to trust our judgement and take our word for it
---if we're not careful, our ‘word’ may lead us to conclude /false = true/! 
+--if we're not careful, our ‘word’ may lead us to conclude /false = true/!
 
 #+NAME: ?
 #+BEGIN_SRC c :tangle (not-currently-working-with)
@@ -1147,7 +1142,7 @@ int main()
 #+END_SRC
 
 However, ~axiomatic~ definitions of recursive functions are useful since the underlying
-provers do not unroll the recursion when possible 
+provers do not unroll the recursion when possible
 --after all, we are simply declaring the type of a function and some properties about
 it, which incidentally, happen to be its defining equations.
 
@@ -1160,7 +1155,7 @@ it, which incidentally, happen to be its defining equations.
      logic integer factorial(integer n);
 
      axiom factorial_base: \forall integer i;  i <= 0  ==>  factorial(i) == 0;
-     axiom factorial_inductive: 
+     axiom factorial_inductive:
           \forall integer i; i >  0  ==>  factorial(i) == i * factorial(i - 1);
   }
 */
@@ -1173,10 +1168,10 @@ headers, for example:
 /*@ axiomatic is_constant
   {
      predicate constant{L}(int * a, integer b, integer e, integer val) reads a[b .. e-1];
-     
-     axiom constant_empty{L}: 
+
+     axiom constant_empty{L}:
        \forall int * a, integer b, e, val; b >= e  ==> constant{L}(a, b, e, val);
-       
+
      axiom constant_non_empty{L}:
        \forall int * a, integer b, e, val; b < e ==>
           ( constant{L}(a,b,e, val)  <==>  constant{L}(a,b,e-1, val) && a[e-1] == val );
@@ -1215,7 +1210,7 @@ void make_constant(int* array, int N, int element)
     @ loop invariant constant_so_far: constant(array, N, \at(N, Pre), element);
     @ loop variant N;
     */
-  for (; 0 != N; N--) 
+  for (; 0 != N; N--)
   { L: array[N-1] = element;
     //@ assert same_elems{L, Here}(array, N, \at(N, Pre));
   }
@@ -1234,7 +1229,7 @@ acting as post-condition. As such, we investigate Hoare triples by using methods
 A contract stipulates under what conditions a method will behave
 --if those conditions are not met, then it's behaviour may be arbitrary.
 For example, a method may behave in a manner ensuring \\ ~x > 1/y~ under the condition ~y > 0~,
-and it may do anything it wants --such as aborting the system or setting ~x = -1~-- 
+and it may do anything it wants --such as aborting the system or setting ~x = -1~--
 when that condition is not met.
 
 All in all, a function call establishes property /R/ precisely when evaluating its
@@ -1260,7 +1255,7 @@ is not a type at all! One cannot declare a variable of type ~void~.
 
 Function calls that yield a value are terms whereas those that do not constitute statements.
 {{{fold(The ‘fun’ in ‘function’)}}}
-#+BEGIN_SRC c :tangle (not-currently-working-with "fun_in_function") 
+#+BEGIN_SRC c :tangle (not-currently-working-with "fun_in_function")
 #include<stdio.h> // for IO
 
 int  f(){ return 3;}
@@ -1279,8 +1274,8 @@ int main()
 #+END_SRC
 {{{end-fold}}}
 
-A /program/ is an sequence of global variables, function declarations, then a special 
-function called ~main~. Since sequences are ordered, all names are declared before use! 
+A /program/ is an sequence of global variables, function declarations, then a special
+function called ~main~. Since sequences are ordered, all names are declared before use!
 In C, ~main~ usually exits with ~return 0~. Global variables tend to pollute
 the namespace and are more trouble than they're worth, so we shall ignore them
 --however they are already included by default since assignment is a top-level construct.
@@ -1288,12 +1283,12 @@ Incidentally, function declarations with no arguments may be used to simulate gl
 constants.
 
 Note that C does not permit function overloading.
-Moreover, C uses the same namespace for methods as well as simple variables 
---which in is not the case in, say, Java which permits naming a method ~f~ and a 
+Moreover, C uses the same namespace for methods as well as simple variables
+--which in is not the case in, say, Java which permits naming a method ~f~ and a
 variable ~f~ to obtain the valid invocation ~f(f)~!
 
-{{{fold(Crash! There is no overloading in C.)}}} 
-#+BEGIN_SRC c :tangle (not-currently-working-with "no_overloading_in_c") 
+{{{fold(Crash! There is no overloading in C.)}}}
+#+BEGIN_SRC c :tangle (not-currently-working-with "no_overloading_in_c")
 int it(int x){ return x; }
 int it = 5;
 int maybe = it(it);
@@ -1307,9 +1302,9 @@ The value of the expression is simply ignored when it is used as a statement.
 
 Conversely, statements may be regarded as an effectful expression.
 For example, assignment ~x ≔ E~ assigns the value of ~E~ to ~x~ and /returns/ the value of ~E~.
-Whence, the notion of 
+Whence, the notion of
 {{{fold(“Continued Assignments” are right-associative)}}}
-#+BEGIN_SRC c :tangle (not-currently-working-with "assgns_are_right_assoc") 
+#+BEGIN_SRC c :tangle (not-currently-working-with "assgns_are_right_assoc")
 void continued_assgns()
 {
   int x = 1, y = 2, z = 4;
@@ -1335,7 +1330,7 @@ Look at the definition of ~abs~ below and notice:
   separate lines. We may also use implication ~==>~, disjunction ~||~, negation ~!~,
   value equality ~==~, and Boolean equivalence ~<==>~.
   - Notice that implication:  ~A ==> B~ informs that when ~A~ is true then so is ~B~,
-    and if ~A~ is false then we don't care and consider the whole thing to be true. 
+    and if ~A~ is false then we don't care and consider the whole thing to be true.
 + Notice that we may /name/ our conditions, which is helpful to remind us of their purpose
   as well as being helpful in the frama-c output.
 
@@ -1362,7 +1357,7 @@ to the following block by removing the prefix ~-not~, then run the code with ~F6
 will take a while dealing with ~printf~!
 #+NAME: Runtime problems with abs
 #+BEGIN_SRC c :tangle (not-currently-working-with)
-#include<stdio.h>   // for IO 
+#include<stdio.h>   // for IO
 #include<limits.h>  // bounds on integers
 #include<math.h>
 
@@ -1427,11 +1422,11 @@ or both.
 /*@ requires INT_MIN < val;
   @ ensures always_nonnegative: \result >= 0;
   @
-  @ behavior positive_input: 
+  @ behavior positive_input:
   @    assumes val > 0;
   @    ensures \result == val;
   @
-  @ behavior negative_input: 
+  @ behavior negative_input:
   @    assumes val <= 0;
   @    ensures \result == -val;
   @
@@ -1446,16 +1441,16 @@ int abs(int val)
 
 {{{fold(Exercises on Behaviours)}}}
 
-*Exercise* 
+*Exercise*
 Replace each FixMe so that the program is proven correct.
 #+BEGIN_SRC c :tangle (not-currently-working-with)
 #include "Prelude.c"
 /*@ requires INT_MIN < val;
   @ ensures always_nonnegative: \result >= 0;
-  @ ensures Exercise:  
+  @ ensures Exercise:
   @      FixMe                             // Positive case
   @   && (val <= 0  ==> \result == -val)   // Negative or 0 case
-  @   && !(val > 0 && val <= 0)            // Disjointness condition   
+  @   && !(val > 0 && val <= 0)            // Disjointness condition
   @   && FixMe                             // Completeness condition
   @   ;
  */
@@ -1465,7 +1460,7 @@ int abs(int val)
 }
 #+END_SRC
 
-*Exercise* 
+*Exercise*
 Replace each FixMe with the weakest proposition so that the program is proven correct.
 
 #+NAME: Weakest propositions to make the behaviours complete
@@ -1474,11 +1469,11 @@ Replace each FixMe with the weakest proposition so that the program is proven co
 /*@ requires INT_MIN < val;
   @ ensures always_nonnegative: \result >= 0;
   @
-  @ behavior positive_input: 
+  @ behavior positive_input:
   @    assumes Exercise: FixMe;
   @    ensures \result == val;
   @
-  @ behavior negative_input: 
+  @ behavior negative_input:
   @    assumes Exercise: FixMe;
   @    ensures \result == -val;
   @
@@ -1490,7 +1485,7 @@ int abs(int val)
 }
 #+END_SRC
 
-*Exercise* 
+*Exercise*
 Replace each FixMe with the strongest proposition so that the program is proven correct.
 
 #+NAME: Strongest propositions to make the behaviours disjoint
@@ -1499,7 +1494,7 @@ Replace each FixMe with the strongest proposition so that the program is proven 
 /*@ requires INT_MIN < val;
   @ ensures always_nonnegative: \result >= 0;
   @
-  @ behavior positive_input: 
+  @ behavior positive_input:
   @    assumes Exercise: FixMe;
   @    ensures \result == val;
   @
@@ -1536,7 +1531,7 @@ In some sense /false, true/ behave for the 𝔹ooleans as /-∞, +∞/ behave fo
 | Disjunction ∨  | Maximum ↑   |
 
 Using this correspondence we can rephrase the “Golden Rule” /p ∧ q ≡ p ≡ q ≡ p ∨ q/
-as the following trivial property /x ↓ y = x  ≡  y = x ↑ y/ 
+as the following trivial property /x ↓ y = x  ≡  y = x ↑ y/
 --“The minimum of two numbers is the first precisely when the second is their maximum.”
 Neat Stuff!
 
@@ -1582,7 +1577,7 @@ Conversely, that maximum is the least upper bound,
 /x ≤ z  ∧  y ≤ z  ≡  x ↑ y ≤ z/, corresponds to the
 characterisation of disjunction /(p ⇒ r) ∧ (q ⇒ r)  ≡  (p ∨ q) ⇒ r/
 --incidentally this is also known as “case analysis” since one proves
-/p ∨ q ⇒ r/ by providing a proofs that if /p ∨ q/ is true due to /p/ then 
+/p ∨ q ⇒ r/ by providing a proofs that if /p ∨ q/ is true due to /p/ then
 with /p/ in hand we need to show /r/, and likewise if /p ∨ q/ is true due to /q/.
 
 *Exercise*
@@ -1610,8 +1605,8 @@ not only produce a value, as before, but also alter the state altogether.
 ( Foreshadowing: The ~assigns~ ACSL keyword! )
 
 Since a ~return~ interrupts executation, the sequence computation rule
-~wp (S₁;S₂) = wp S₁ ∘ wp S₂~ is no longer valid when the execution of ~S₁~ causes the 
-execution of a ~return~ thereby necessitating that ~S₂~ is not executed. 
+~wp (S₁;S₂) = wp S₁ ∘ wp S₂~ is no longer valid when the execution of ~S₁~ causes the
+execution of a ~return~ thereby necessitating that ~S₂~ is not executed.
 As we have already seen, we keep the rule valid by simply defining ~wp U R ≡ true~
 for any unreachable code ~U~ --as is ~S₂~ when ~S₁~ has a return.
 
@@ -1624,7 +1619,7 @@ int main()
   goto End;
   //@assert my_cool_nonsense: 0 == 1;    // This is unreachale but ‘true’.
 
-  End: 
+  End:
   return 0;
 }
 #+END_SRC
@@ -1638,16 +1633,16 @@ int main()
   return 0;
 }
 #+END_SRC
-That is, Frama-C considers ‘partial correctness’: A specification is satisfied, 
+That is, Frama-C considers ‘partial correctness’: A specification is satisfied,
 /provided/ it terminates.
 
-In addition, since imperative expressions can modify memory, considerations must be 
+In addition, since imperative expressions can modify memory, considerations must be
 given to the fact arguments of a function are evaluated from left to right.
 For example, suppose ~x,y~ are imperative constructions yield integers, then
  ~x + y~ and ~y + x~ are not guaranteed to produce the same behaviour!
 
 {{{fold(Addition with side-effects is *not* symmetric!)}}}
-#+BEGIN_SRC c :tangle (not-currently-working-with "no_symmetry_for_us") 
+#+BEGIN_SRC c :tangle (not-currently-working-with "no_symmetry_for_us")
 #include<stdio.h> // for IO
 
 int f(){ printf("\nf(): Hello with Four!");  return 4;}
@@ -1678,9 +1673,9 @@ Remember to remove all ~printf~'s!
 ** Passing Arguments by Value and by Reference
 
 Applying the definition of ~wp~ to the body of the following ~swap~ gives us
-~wp swap = id~, thereby demonstrating that /this/ ~swap~ does not change the 
+~wp swap = id~, thereby demonstrating that /this/ ~swap~ does not change the
 values of two variables!
-#+BEGIN_SRC c :tangle (not-currently-working-with "useless_swap") 
+#+BEGIN_SRC c :tangle (not-currently-working-with "useless_swap")
 void swap(int a, int b){ int c; c = a; a = b; b = c; }
 #+END_SRC
 The default mechanism of argument passing is that of /pass by value/:
@@ -1689,7 +1684,7 @@ Indeed, what should ~swap(x+y, 2)~ perform if it were to “alter the given vari
 
 To say that two /distinct/ variables share the /same location/ in memory
 requires us to formally introduce a notion of location that variables may reference.
-Rather than introduce a new such type, C makes the convention that certain numeric 
+Rather than introduce a new such type, C makes the convention that certain numeric
 values act --possibly dual roles-- as reference locations.
 
 Hence we can associate variables to references which are then associated to values.
@@ -1726,7 +1721,7 @@ Inverses:  ∀ r : Ref T.  &(*r) ≈ r
 #+END_EXAMPLE
 
 {{{fold(‘Proofs’ of Inverse Laws)}}}
-#+BEGIN_SRC c :tangle (not-currently-working-with "understanding_references") 
+#+BEGIN_SRC c :tangle (not-currently-working-with "understanding_references")
 void understanding_references()
 {
   int  a = 4;    // integer a refers to 4
@@ -1762,7 +1757,7 @@ The contents of ~t~, i.e., ~*t~, now refer to the value of ~u~.
 For example, ~*&x = u~ has the same behaviour as the assignment ~x = u~.
 
 {{{fold(A Detailed Look At ‘swap’)}}}
-#+BEGIN_SRC c :tangle (not-currently-working-with "swap_in_detail") 
+#+BEGIN_SRC c :tangle (not-currently-working-with "swap_in_detail")
 #include<stdio.h> // for IO
 
 // x and y themselves cannot be assigned to: They're constant.
@@ -1796,12 +1791,12 @@ C removes from memory the reference associated with a variable
 when that variable is removed from the environment.
 
 {{{fold(Dereferencing Garbage)}}}
-#+BEGIN_SRC c :tangle (not-currently-working-with "dangling_references") 
+#+BEGIN_SRC c :tangle (not-currently-working-with "dangling_references")
 #include<stdio.h> // for IO
 
 int* f(const int p)
 {
-  int n = p; 
+  int n = p;
   return &n;
 
   // n only exists locally,
@@ -1850,7 +1845,7 @@ void at_example(int *a)
   *a = tmp;
 
   // We are now in the memory state after the fourth line.
-  // 
+  //
   // Here are some true facts about the memory states:
   //@ assert *a == \at(*a, Pre);     // Current value of *a is same as before method.
   //@ assert \at(*a, Here) == \at(*a, Pre);     // More explicitly.
@@ -1932,12 +1927,12 @@ When the pointers refer to simple data, we may act /functionally/ in that we cop
 data to newly allocated memory locations. However, sometimes --such as when we program
 with linked lists-- copying large amounts of data is unreasonable and we may simply
 want to alter given pointers directly. When the given pointers are /identical/ then an
-alteration to one of them is actually an alteration to the rest! 
+alteration to one of them is actually an alteration to the rest!
 
 When we program with lists, we shall see that if we catenate two lists by altering
 the first to eventually point to the second then it all works.
 However, if we catenate a list with itself then the resulting alteration
-is not the catenation of the list with itself but instead is an 
+is not the catenation of the list with itself but instead is an
 infinite cycle of the first list! --We'll see this later on.
 
 Here is a simpler example,
@@ -1964,16 +1959,16 @@ As such the final ~ensures~ is not necessarily true either!
 
 We need to uncomment the ~separated~ declaration: The memory locations are distinct.
 
-Notice that in the final call below, since the pre-condition to 
+Notice that in the final call below, since the pre-condition to
 ~increment_first_by_second~ fails, we have breached its contract and therefore
-no longer guarenteed the behaviour it ~ensures~. 
+no longer guarenteed the behaviour it ~ensures~.
 Since the contract does not tells what happens when we breach it, anything is possible
 and so anything is “true”!
 #+NAME: Example of how contract breach is dangerous on the logical consequences
 #+BEGIN_SRC c :tangle (not-currently-working-with)
 int main()
 {
-  int life = 42, universe = 12; 
+  int life = 42, universe = 12;
 
   int *this = &life;
   int *new  = &universe;
@@ -2010,7 +2005,7 @@ when we want to use an external libary's methods but do not --or cannot-- want t
 
 #+NAME: Example of using un-implemented methods' specifications
 #+BEGIN_SRC c :tangle (not-currently-working-with)
-#include<limits.h> 
+#include<limits.h>
 
 /*@ requires val > INT_MIN;
   @ assigns \nothing;
@@ -2037,12 +2032,12 @@ int max(int a, int b);
 
   @ ensures always_non_negative: inherited_from_abs: \result >= 0;
 
-  @ ensures upper_bound: inherited_from_max: 
+  @ ensures upper_bound: inherited_from_max:
          \result >= a && \result >= -a    // ≈ result ≥ |a|
       && \result >= b && \result >= -b;   // ≈ result ≥ |b|
 
-  @ ensures selection: inherited_from_max: 
-          \result == a || \result == -a   
+  @ ensures selection: inherited_from_max:
+          \result == a || \result == -a
        || \result == b || \result == -b;
 */
 int abs_max(int a, int b)
@@ -2052,7 +2047,7 @@ int abs_max(int a, int b)
 #+END_SRC
 
 If we press ~F8~, the frama-c gui shows green bullets for the declarations'
-specifications. They have no implementation and so are assumed to be true. 
+specifications. They have no implementation and so are assumed to be true.
 Then the ~abs_max~ operation ‘inherits’ the preconditions and postconditions of
 the methods it calls along the variables it uses.
 
@@ -2076,9 +2071,9 @@ and in Agda we may go on to use the ~record~ keyword.
 
 C records are known as /structures/ and they are just a list of
 labels with their types. In using ~struct~ types, the ~struct~
-keyword must precede the type name in all declarations. 
+keyword must precede the type name in all declarations.
 #+NAME: Looking at a struct and some operations on it
-#+BEGIN_SRC c :tangle (not-currently-working-with "playing_with_structs") 
+#+BEGIN_SRC c :tangle (not-currently-working-with "playing_with_structs")
 struct Pair
 {
   int fst;
@@ -2109,23 +2104,23 @@ void woah(struct Pair* p)
 # Remember to have blocks with printf out of focus when proving with f8 or f9.
 #
 #+NAME: Example uses of structs
-#+BEGIN_SRC c :tangle (not-currently-working-with "playing_with_structs") 
+#+BEGIN_SRC c :tangle (not-currently-working-with "playing_with_structs")
 #include<stdio.h> // for IO
 
 int main()
 {
 
   struct Pair p; // no initalisation
-  
+
   // Composite type without a name.
   struct {int one; int two;} q;
-  
+
   // Initialisation with declaration.
   struct Pair r = {11, 13};
 
   // Note that in C, non-initialised variables have “arbitrary” values
   // which may change according to each new compilation!
-  
+
   printf("\n p = ⟨fst: %d, snd: %d⟩", p.fst, p.snd);
 
   // Set only first field.
@@ -2156,7 +2151,7 @@ int main()
 + Record variables declared without a value are given the special default value ~null~.
 
 + In Java, a record variable's reference is not directly associated with a record in memory!
-  It is usually associated with ~null~ or another reference. 
+  It is usually associated with ~null~ or another reference.
   # Java is designed this way to reduce direct reference manipulation?
 
 To associate a record with a variable, we need to create memory large enough to contain the record
@@ -2171,7 +2166,7 @@ class Pair
   int snd;
 }
 
-Pair p = new Pair(); 
+Pair p = new Pair();
 #+END_EXAMPLE
 The resulting environment is ~p ↦ r~ and the resulting memory state is
 ~r ↦ r', r' ↦ {fst = 0, snd = 0}~. Note that default values are used.
@@ -2327,7 +2322,7 @@ Arrays are commonly handled using loops; let's look at some examples.
 
 #+NAME: linear search yielding found index, or length otherwise
 #+BEGIN_SRC c :tangle (not-currently-working-with)
-/*@ requires 0 < N;            
+/*@ requires 0 < N;
   @ requires \valid_read(array + (0 .. N - 1));  // N is the length of the array
   @
   @ assigns \nothing;
@@ -2359,7 +2354,7 @@ int linear_search(int* array, int N, int element)
 
 Some remarks are in order.
 
-+  ~\valid_read(array + (0 .. N - 1))~ ensures that the memory addresses 
++  ~\valid_read(array + (0 .. N - 1))~ ensures that the memory addresses
    ~array + 0, ..., array + N-1~ can be read --as discussed when introducing ~\valid~.
 
 + The loop continues as long as we have not yet found the element.
@@ -2367,8 +2362,8 @@ Some remarks are in order.
   - That is, forall index /i/ in the array bounds, we have /array[i] ≠ element/.
   - This invariant is stated using the ~forall~ syntax.
 
-+ The variable naming ~n, N~ is intended to be suggestive: 
-  When /n = N/ then we have traversed the whole array. 
++ The variable naming ~n, N~ is intended to be suggestive:
+  When /n = N/ then we have traversed the whole array.
   - We began at 0 and are working upward to /N/.
   - At each step, we traverse the array by one more item
     thereby decreasing the amount of items remaining --which is /N - n/.
@@ -2389,7 +2384,7 @@ range from the body predicate, whereas the existential ‘∃’ uses ~&&~
 Notice the striking difference between
 the ~\exists integer x; \false && even x~
 --which is unprovable since false is never true!--
-and ~\exists integer x; \false ==> even x~ 
+and ~\exists integer x; \false ==> even x~
 --which can be satisfied by infinitely many ~x~, since false implies anything.
 
 *** Exercise: Linear Search Downwards with No Explicit Locals      :ignore:
@@ -2402,7 +2397,7 @@ a new local variable ~n~.
 #+BEGIN_SRC c :tangle (not-currently-working-with)
 #include "Prelude.c"
 
-/*@ requires 0 < N;            
+/*@ requires 0 < N;
   // @ requires Exercise: read access to a[0], ..., a[N-1];
   @
   // @ assigns FixMe;
@@ -2483,7 +2478,7 @@ Since C requires names to be declared before use, we may have mutually recursive
 functions by ‘prototyping’: Declaring the function signature, then at some point
 providing the actual implementation.
 {{{fold(Example Prototyping for Mutual Recursion)}}}
-#+BEGIN_SRC c :tangle (not-currently-working-with "prototyping") 
+#+BEGIN_SRC c :tangle (not-currently-working-with "prototyping")
 #include<stdio.h> // for IO
 #include<stdbool.h>
 
@@ -2520,10 +2515,10 @@ have been any function!
 
 {{{fold(Recursion  ≠  ℕ-Induction)}}}
 We generally think of recursive definitions as definitions by usual ℕ-induction, however
-this is not absolutely true. 
+this is not absolutely true.
 E.g., the following function at ~n~ not only relies on
 values on smaller inputs but also on values at larger inputs to compute the value at ~n~!
-#+BEGIN_SRC c :tangle (not-currently-working-with "recursion_neq_induction") 
+#+BEGIN_SRC c :tangle (not-currently-working-with "recursion_neq_induction")
 #include<stdio.h> // for IO
 
 int iterations = 0;
@@ -2576,7 +2571,7 @@ an equation where the unknown variable is the function currently being defined.
 For example, the factorial function is the /unique partial function/ ~f~ satisfying
 the equation
 #+BEGIN_SRC haskell
-f  ≈ (x ↦ if x ≈ 0 then 1 else x * f(x-1)) 
+f  ≈ (x ↦ if x ≈ 0 then 1 else x * f(x-1))
 #+END_SRC
 This equation has the form ~f ≈ F(f)~, so it is a “fixed point equation”.
 
@@ -2606,10 +2601,10 @@ Notice that the factorial function can be written without using assignments:
   @
   @    axiom fact_zero:  \forall integer n;    factorial(0) == 1;
   @
-  @    axiom fact_succ:  \forall integer n; 0 <= n 
+  @    axiom fact_succ:  \forall integer n; 0 <= n
   @                 ==>  factorial (n + 1) == n * factorial (n);
   @
-  @    axiom fact_monotone : \forall integer m,n; 0 <= m <= n 
+  @    axiom fact_monotone : \forall integer m,n; 0 <= m <= n
   @          ==> factorial(m) <= factorial(n);
   @ }
   */
@@ -2638,7 +2633,7 @@ int fact_imp(int n)
   return r;
 }
 
-// ≈ 
+// ≈
 
 /*@ requires 0 <= n;
   @ requires factorial(n) <= INT_MAX;
@@ -2714,14 +2709,14 @@ x == y  ⇒  Segmentation Fault
 
 {{{comment}}}
 #+NAME: Testing the previous code block
-#+BEGIN_SRC c :tangle (not-currently-working-with "enticing_tests") 
+#+BEGIN_SRC c :tangle (not-currently-working-with "enticing_tests")
 #include "enticing.c"
 #include<stdio.h>
 
 #define MkTest(aa, bb)   a = aa, b = bb; whatDo(x, y); \
                          printf("\n⟨x = %d, y = %d⟩ ↦ ⟨x = %d, y = %d⟩", aa, bb, *x, *y);
 
-int main() 
+int main()
 {
   int a, b;
   int *x = &a, *y = &b;
@@ -2738,15 +2733,15 @@ int main()
   whatDo(x, y);
   */
 
-  return 0; 
+  return 0;
 }
 #+END_SRC
 {{{end-comment}}}
 
 With this guidance in hand, we aim to axiomatise the power function:
 #+NAME: axiomatisation of power function
-#+BEGIN_SRC c :tangle (not-currently-working-with "Prelude") 
-/*@ axiomatic Pow 
+#+BEGIN_SRC c :tangle (not-currently-working-with "Prelude")
+/*@ axiomatic Pow
   @ {
   @    logic integer pow(integer b, integer n);
   @
@@ -2757,7 +2752,7 @@ With this guidance in hand, we aim to axiomatise the power function:
   @    axiom pow_homomorphism:  \forall integer b, m, n;
   @                 pow(b, m + n) == pow(b, m) * pow(b, n);
   @
-  @    axiom pow_monotone : \forall integer b,m,n; b >= 0  &&  0 <= m <= n 
+  @    axiom pow_monotone : \forall integer b,m,n; b >= 0  &&  0 <= m <= n
   @          ==> pow(b,m) <= pow(b,n);
   @ }
   */
@@ -2770,7 +2765,7 @@ Notice that there are infinitely many solutions ~f~ to the equations
 Which ones? Since every natural number is of the form /1 + 1 + ⋯ + 0/
 the second requirement yields \\ /f(n) = f (1 + 1 + ⋯ + 0) = f 1 * f 1 * ⋯ f 1 * f 0;/
 which by the first requirement simplifies to /f(n) = (f 1)ⁿ/.
-Hence for any choice of number /f(1) : ℕ/, we obtain a function /f/ 
+Hence for any choice of number /f(1) : ℕ/, we obtain a function /f/
 that satisfies these definitions. If we want /f/ to be the /n/ product of a number
 /b/ then we need to insist /f 1 = b/ --which is just ~pow_one~!
 #
@@ -2779,7 +2774,7 @@ that satisfies these definitions. If we want /f/ to be the /n/ product of a numb
 
 From the axioms, we obtain some useful lemmas.
 #+NAME: some lemmas about pow
-#+BEGIN_SRC c :tangle (not-currently-working-with "Prelude") 
+#+BEGIN_SRC c :tangle (not-currently-working-with "Prelude")
 //@ lemma pow_succ:  \forall integer b, n; n >= 0  ==>     pow(b, n + 1) == pow(b, n) * b;
 //@ lemma powNonNeg : \forall integer b,n; b >= 0 ==> n >= 0 ==> pow(b,n) >= 0;
 //@ lemma pow2bound : \forall integer n; 0 <= n < 31 ==> pow(2, n) < INT_MAX;
@@ -2796,7 +2791,7 @@ in his excellent specifications and correctness text, [[http://www.cs.toronto.ed
 
 /*@  requires \valid(x) && \valid(y);
      requires 0 <= *x < 31;
-     requires Exercise: FixMe;      // Assuming \false, gives us anything! 
+     requires Exercise: FixMe;      // Assuming \false, gives us anything!
      assigns *x, *y;
      ensures Exercise: FixMe;
  */
@@ -2856,7 +2851,7 @@ The following utilities are loaded when this file is opened.
 After the first time the file ~InteractiveWayToC.el~ is created and this section
 may be deleted, or ~COMMENT~-ed, as it is loaded in the ~footer~ section at the end of this file.
 
-0. Make some changes, look at them with ~f7~. 
+0. Make some changes, look at them with ~f7~.
     - Or execute with ~f6~ if there is a ~main~ method.
 1. Check your progress with ~f9~, within Emacs.
 2. If confused, open the Frama-C gui with ~f8~.
@@ -2874,12 +2869,12 @@ Every source block is in ‘focus’ when the variables ~NAME~ and ~NAMECode~ re
 
 We explicitly change focus using ~[not-]currently-working-with~ methods.
 {{{fold([not-]currently-working-with)}}}
-#+BEGIN_SRC emacs-lisp :tangle InteractiveWayToC.el 
+#+BEGIN_SRC emacs-lisp :tangle InteractiveWayToC.el
 (defun buffer-name-sans-extension () ""
   (file-name-sans-extension (buffer-name))
 )
 
-(defun currently-working-with (&optional name) 
+(defun currently-working-with (&optional name)
   "Provide the name (without extension) of the source block's resulting file.
    The name is then tied to the “NAMECode” global variable utilised
    by the “show-code” method, <f7>, and the “interpret” command's global variable “NAME”.
@@ -2891,9 +2886,9 @@ We explicitly change focus using ~[not-]currently-working-with~ methods.
   (setq NAMECode (concat name ".c"))
 )
 
-(defun not-currently-working-with (&optional name) 
+(defun not-currently-working-with (&optional name)
   "When “:tangle fn” has “fn” being the empty string, the tangle does not transpire.
-   As such, it is as if we are not actually generating the source block. 
+   As such, it is as if we are not actually generating the source block.
 
    This operation only returns the empty string and does not alter any existing state.
    If we alter state, then earlier invocations to (currently-working-with) are rendered
@@ -2921,17 +2916,17 @@ the same one write to the same file.
 In a new line enter ~<s~ then at the end press ~TAB~ to obtain a nice hello-world
 template. Some code will be generated for you --free of charge--, edit it as you like.
 {{{fold(Hello World Template Using <s)}}}
-#+BEGIN_SRC emacs-lisp :tangle InteractiveWayToC.el 
+#+BEGIN_SRC emacs-lisp :tangle InteractiveWayToC.el
 (make-variable-buffer-local 'org-structure-template-alist)
-(setq TEMPLATE 
-  (concat 
+(setq TEMPLATE
+  (concat
    "#+NAME: ???? -- goal of this code block"
-   "\n#+BEGIN_SRC " Language " :tangle (currently-working-with \"HelloWorld\") \n" 
+   "\n#+BEGIN_SRC " Language " :tangle (currently-working-with \"HelloWorld\") \n"
    "#include<stdio.h> // for IO"
    "\nint main() \n{\n  printf(\"--Hello, World!--\");\n  return 0; \n}"
    "\n#+END_SRC"))
 (add-to-list 'org-structure-template-alist `("s" ,TEMPLATE))
-#+END_SRC 
+#+END_SRC
 {{{end-fold}}}
 
 Then to see the code generated by this file press ~M-x~ then enter ~show-code~ then enter;
@@ -2939,48 +2934,48 @@ alternatively, press ~C-x C-e~ after the final parenthesis: (show-code).
 
 My definition of ~(show-code)~ begins with closing the code buffer if it exists,
 then continue by extracting the most recent code and displaying it below the current buffer.
-The definition of ~(interpret)~ is nearly the same except we switch to an output buffer, 
+The definition of ~(interpret)~ is nearly the same except we switch to an output buffer,
 and create it if it doesn't exist.
 Note that our interpretation command is essentially the following command line invocation:
 ~NAME=myfilename ; gcc $NAME.c -o $NAME.exe ; ./$NAME.exe~
 
 {{{fold(Commands for showing code, running code, and running frama-c)}}}
 #+BEGIN_SRC emacs-lisp :tangle InteractiveWayToC.el
-(defun show-code () "Show focused source blocks in a new buffer." 
-  (interactive) 
-  (ignore-errors (kill-buffer NAMECode)) 
+(defun show-code () "Show focused source blocks in a new buffer."
+  (interactive)
+  (ignore-errors (kill-buffer NAMECode))
   (save-buffer)
-  (org-babel-tangle) 
-  (split-window-below) 
-  (find-file NAMECode) 
+  (org-babel-tangle)
+  (split-window-below)
+  (find-file NAMECode)
   (other-window 1))
 
 ;; Since there are many generated files, let's mention the name
 ;; of the program file currently being executed, or proven.
 ;;
-(defun insert-focused-name () 
+(defun insert-focused-name ()
    "Insert the name of the focused source blocks at the beginning of the buffer."
   (beginning-of-buffer)
   (insert "================\n⟪ " NAME ".c ⟫\n================\n\n"))
 
-(defun interpret () "Execute focused source blocks in a new buffer." 
+(defun interpret () "Execute focused source blocks in a new buffer."
   (interactive)
   (save-buffer)
   (org-babel-tangle)
-  (switch-to-buffer-other-window "*Shell Command Output*") 
-  (shell-command 
+  (switch-to-buffer-other-window "*Shell Command Output*")
+  (shell-command
     (concat "cd " default-directory "; NAME=" NAME " ; gcc $NAME.c -o $NAME.exe ; ./$NAME.exe"))
   (insert-focused-name)
   ;; Go back to the literate buffer.
   (other-window 1))
 
-(defun frama-c () "" 
-  (interactive) 
+(defun frama-c () ""
+  (interactive)
   (save-buffer)
-  (org-babel-tangle) 
+  (org-babel-tangle)
   (shell-command (concat "frama-c-gui " NAMECode " -wp -rte &")))
 
-(defun try (this that) "" 
+(defun try (this that) ""
   (condition-case nil (eval this) (error (eval that))))
 #+END_SRC
 {{{end-fold}}}
@@ -2998,10 +2993,10 @@ the end of the buffer and, ideally but not necessarily, should see all goals hav
 # Yes gui: (shell-command (concat "frama-c-gui " NAMECode " -wp -then -rte -wp &"))
 
 {{{fold(frama-c-no-gui)}}}
-#+BEGIN_SRC emacs-lisp :tangle InteractiveWayToC.el 
-(defun frama-c-no-gui () "" 
-  (interactive) 
-  (org-babel-tangle) 
+#+BEGIN_SRC emacs-lisp :tangle InteractiveWayToC.el
+(defun frama-c-no-gui () ""
+  (interactive)
+  (org-babel-tangle)
   ;; Avoid generating proof goal statements --for now.
   ;; (shell-command (concat "frama-c " NAMECode " -wp -wp-msg-key=print-generated -rte"))
   (shell-command (concat "frama-c " NAMECode " -wp -wp-timeout 10 -rte"))
@@ -3027,7 +3022,7 @@ the end of the buffer and, ideally but not necessarily, should see all goals hav
   ;; ⟨ This is not an issue when proofs are not being generated. ⟩
   (if (equal frama-c-state "Exercise")
         (setq frama-c-status (concat frama-c-status " ⟪There are holes!⟫"))
-        (when (or (equal frama-c-state "Proved goals")           
+        (when (or (equal frama-c-state "Proved goals")
                   (eq (frama-c-progress) 100))
               (set-face-background 'hl-line "pale green")
               (try '(search-forward "Proved goals") t)))
@@ -3039,22 +3034,22 @@ the end of the buffer and, ideally but not necessarily, should see all goals hav
 
 Where the ~frama-c-progress~ command yields the percentage denoting the number of goals proven.
 {{{fold(frama-c-progress)}}}
-#+BEGIN_SRC emacs-lisp :tangle InteractiveWayToC.el  
+#+BEGIN_SRC emacs-lisp :tangle InteractiveWayToC.el
 (defun frama-c-progress () ""
-  (let ( (here (point)) ) 
+  (let ( (here (point)) )
   (beginning-of-buffer)
   (try '(search-forward "Proved goals:") 0)
   ;; (kill-line)
     (copy-region-as-kill (point) (point-at-eol))
     (goto-char here)
-    (* 100 (string-to-number (calc-eval (current-kill 0))))    
+    (* 100 (string-to-number (calc-eval (current-kill 0))))
   ))
 #+END_SRC
 {{{end-fold}}}
 
 Finally,
 {{{fold(Local Function Keys)}}}
-#+BEGIN_SRC emacs-lisp :tangle InteractiveWayToC.el 
+#+BEGIN_SRC emacs-lisp :tangle InteractiveWayToC.el
 (local-set-key (kbd "<f6>") 'interpret)
 (local-set-key (kbd "<f7>") 'show-code)
 (local-set-key (kbd "<f8>") 'frama-c)
@@ -3082,4 +3077,3 @@ may happen without being interrupted with undefined issues. Whence the definitio
 # eval: (progn (fci-mode) (setq fci-rule-column 90))
 # compile-command: (interpret)
 # End:
-
